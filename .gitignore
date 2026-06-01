@@ -22,3 +22,7 @@ xcuserdata/
 .remember/
 ruvector.db
 *.log
+
+# Remotion promo project
+promo/node_modules/
+promo/out/

@@ -14,6 +14,12 @@ Swipe left to trash, right to keep, up to favorite, down to skip. Find duplicate
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
+<br/>
+
+<img src="PhotoSwipe/docs/demo.gif" width="100%" alt="PhotoSwipe demo" />
+
+<sub>▶ <a href="PhotoSwipe/docs/demo.mp4">Watch the full-quality video</a> · made with <a href="https://remotion.dev">Remotion</a></sub>
+
 </div>
 
 ---

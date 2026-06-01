@@ -18,13 +18,13 @@ Swipe left to trash, right to keep, up to favorite, down to skip. Find duplicate
 
 <img src="PhotoSwipe/docs/demo.gif" width="100%" alt="PhotoSwipe demo" />
 
-<sub>▶ <a href="PhotoSwipe/docs/demo.mp4">Watch the full-quality video</a> · made with <a href="https://remotion.dev">Remotion</a></sub>
+<sub><a href="PhotoSwipe/docs/demo.mp4">Watch the full-quality video</a> · made with <a href="https://remotion.dev">Remotion</a></sub>
 
 </div>
 
 ---
 
-## ✨ Overview
+## Overview
 
 Got thousands of photos you'll never sort through? PhotoSwipe turns the dreadful
 chore of cleaning your camera roll into a fast, satisfying swipe game.
@@ -36,13 +36,13 @@ photos still land in **Recently Deleted (30 days)**, so mistakes are recoverable
 
 > No account. No servers. No tracking. Your photos never leave your phone.
 
-## 📸 Screenshots
+## Screenshots
 
 | Pick a source | Swipe to decide | Find duplicates | Freed space + stats |
 |:---:|:---:|:---:|:---:|
 | ![Picker](PhotoSwipe/docs/screenshots/01-picker.png) | ![Swipe](PhotoSwipe/docs/screenshots/02-swipe.png) | ![Duplicates](PhotoSwipe/docs/screenshots/03-duplicates.png) | ![Review](PhotoSwipe/docs/screenshots/04-review.png) |
 
-## 🚀 Features
+## Features
 
 ### Swipe to sort
 - **Left → Trash**, **Right → Keep**, **Up → Favorite**, **Down → Skip for later**
@@ -52,7 +52,7 @@ photos still land in **Recently Deleted (30 days)**, so mistakes are recoverable
 
 ### Built for huge libraries (7,000+ photos)
 - **Pause & resume** — every decision is remembered, so you continue exactly where you stopped
-- **Delete the batch you swiped so far** without finishing the whole library — a "🗑 N" button appears mid-run
+- **Delete the batch you swiped so far** without finishing the whole library — a "Delete N" button appears mid-run
 - A leftover trash queue is offered on the home screen if you quit mid-session
 - **Sources** to break the job into chunks: All Photos · Screenshots · Largest First · by Year
 
@@ -64,33 +64,33 @@ photos still land in **Recently Deleted (30 days)**, so mistakes are recoverable
 ### Know your impact
 - **Freed-space estimate** before you commit a deletion
 - **Lifetime analytics** dashboard: total storage reclaimed, photos deleted, duplicates removed, cleanup sessions
-- A little confetti when you finish a run 🎉
+- A little confetti when you finish a run
 
 ### Safe by design
 - Deletions go through **iOS's native confirmation** sheet
 - Deleted photos remain in **Recently Deleted** for 30 days
 - Favoriting and album-filing use the standard Photos APIs — fully reversible in Photos
 
-## 🎮 Gesture cheat-sheet
+## Gesture cheat-sheet
 
 | Gesture | Action |
 |---|---|
-| Swipe **right** / ❤️ button | Keep |
-| Swipe **left** / 🗑 button | Queue for deletion |
-| Swipe **up** / ⭐ button | Favorite |
+| Swipe **right** / heart button | Keep |
+| Swipe **left** / trash button | Queue for deletion |
+| Swipe **up** / star button | Favorite |
 | Swipe **down** | Skip for later (reappears next session) |
 | **Album** button | Add to an album (create new inline) |
-| **🗑 N** (header) | Delete everything swiped-to-trash so far |
+| **Delete N** (header) | Delete everything swiped-to-trash so far |
 | **Undo** | Revert the last decision |
 
-## 🔒 Privacy
+## Privacy
 
 PhotoSwipe is fully **offline**. It requests photo-library access only to show,
 favorite, organize, and (on your confirmation) delete your photos. There is no
 networking code, no analytics SDK, no account, and no data collection. Lifetime
 stats and review progress are stored locally in `UserDefaults` on your device.
 
-## 📋 Requirements
+## Requirements
 
 - **iPhone** running **iOS 17.0** or later (built and tested through iOS 26)
 - A **Mac** with **Xcode 16** or later (to build & install)
@@ -98,7 +98,7 @@ stats and review progress are stored locally in `UserDefaults` on your device.
 
 ---
 
-## 🛠 Installation & Setup (build it yourself)
+## Installation & Setup (build it yourself)
 
 There is no App Store build yet — you install it from source with Xcode. A
 **free Apple ID** is enough. Takes ~10 minutes the first time.
@@ -142,7 +142,7 @@ iOS blocks running self-built apps until Developer Mode is on:
 
 1. Plug your iPhone into the Mac. On the phone, tap **Trust This Computer** and enter your passcode.
 2. In Xcode's top toolbar, set the run destination to **your iPhone** (not a simulator).
-3. Press **▶︎** (or `Cmd + R`).
+3. Press **the Run button** (or `Cmd + R`).
 
 ### 6. Trust the developer profile
 
@@ -153,10 +153,10 @@ The first launch is blocked by iOS. On the phone:
 Reopen **PhotoSwipe** from the home screen and grant **Full Access** to your
 photo library when prompted (limited access weakens favorite/album/delete).
 
-### ⏳ The 7-day note (free accounts)
+### The 7-day note (free accounts)
 
 Apps signed with a **free** Apple ID expire after **7 days** — the icon stays,
-but it won't launch. Just reconnect and press **▶︎** in Xcode again to refresh
+but it won't launch. Just reconnect and press **the Run button** in Xcode again to refresh
 for another 7 days. A paid **Apple Developer Program** account ($99/yr) extends
 this to a year and removes the limit.
 
@@ -175,12 +175,12 @@ xcrun simctl addmedia booted /path/to/photo.jpg
 
 ---
 
-## 🧰 Troubleshooting
+## Troubleshooting
 
 | Symptom | Fix |
 |---|---|
 | **"Developer Mode disabled"** when running | Enable it: Settings → Privacy & Security → Developer Mode → On, then reboot. |
-| **"Communication with Apple failed / no devices"** in Signing | Connect your iPhone first, then press ▶︎ — the profile is generated on first run. |
+| **"Communication with Apple failed / no devices"** in Signing | Connect your iPhone first, then press the Run button — the profile is generated on first run. |
 | App won't open after a few days | Free-account signing expired (7 days). Reconnect and run from Xcode again. |
 | **"Untrusted Developer"** on launch | Settings → General → VPN & Device Management → trust your Apple ID. |
 | Simulator build fails: *"No simulator runtime version available"* | Your installed Simulator runtime doesn't match the SDK. Install a matching iOS runtime in Xcode → Settings → Components, or build to a real device. |
@@ -189,7 +189,7 @@ xcrun simctl addmedia booted /path/to/photo.jpg
 
 ---
 
-## 🏗 Architecture
+## Architecture
 
 PhotoSwipe is a single-target SwiftUI app using **MVVM** over **PhotoKit**.
 
@@ -234,7 +234,7 @@ near-linear for large libraries.
 SwiftUI · PhotoKit (`PHPhotoLibrary`, `PHCachingImageManager`) · Core Graphics ·
 Swift Concurrency · MVVM. No third-party dependencies.
 
-## 🗺 Roadmap
+## Roadmap
 
 - [ ] Video support
 - [ ] iOS 18 tinted / dark app-icon variants
@@ -244,7 +244,7 @@ Swift Concurrency · MVVM. No third-party dependencies.
 - [ ] Limited-access photo-picker flow
 - [ ] App Store release (replace the private `PHAssetResource.fileSize` size lookup first)
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! This is a small, focused, no-dependency codebase —
 a great place to learn SwiftUI + PhotoKit.
@@ -256,7 +256,7 @@ a great place to learn SwiftUI + PhotoKit.
 
 Found a bug or have an idea? [Open an issue](../../issues).
 
-## ⚠️ Disclaimer
+## Disclaimer
 
 PhotoSwipe deletes photos from your library (with your confirmation, into
 Recently Deleted). Use at your own risk and keep a backup (iCloud Photos / a
@@ -266,11 +266,11 @@ computer) before mass-cleaning. The author is not responsible for lost data.
 > KVC. It works reliably for personal/sideloaded builds but counts as private-API
 > access and must be replaced before any App Store submission.
 
-## 📄 License
+## License
 
 [MIT](LICENSE) © 2026 Alperen Adatepe
 
-## 🙏 Acknowledgements
+## Acknowledgements
 
 - Built with Apple's **PhotoKit** and **SwiftUI**.
 - Duplicate detection inspired by classic **perceptual hashing** (dHash).

@@ -1,5 +1,6 @@
 import SwiftUI
 import Photos
+import UIKit
 
 /// The swiping surface. Header + action bar are pinned via `safeAreaInset`, so
 /// the layout adapts to every phone (notch, Dynamic Island, home-indicator)
@@ -9,11 +10,14 @@ struct SwipeDeckView: View {
     @ObservedObject var vm: SwipeDeckViewModel
     @State private var drag: CGSize = .zero
     @State private var showAlbumSheet = false
+    @State private var isTransitioning = false
+    @State private var flingTask: Task<Void, Never>?
 
     var body: some View {
         deck
             .safeAreaInset(edge: .top, spacing: 0) { header }
             .safeAreaInset(edge: .bottom, spacing: 0) { actionBar }
+            .allowsHitTesting(!isTransitioning)
             .sheet(isPresented: $showAlbumSheet) {
                 AlbumPickerView(vm: vm) { decision in
                     showAlbumSheet = false
@@ -21,6 +25,11 @@ struct SwipeDeckView: View {
                 }
                 .presentationDetents([.medium, .large])
                 .presentationBackground(.ultraThinMaterial)
+            }
+            .onDisappear {
+                flingTask?.cancel()
+                flingTask = nil
+                isTransitioning = false
             }
     }
 
@@ -148,7 +157,13 @@ struct SwipeDeckView: View {
                     .id(current.localIdentifier)
                     .offset(drag)
                     .rotationEffect(.degrees(Double(drag.width / 16)), anchor: .bottom)
-                    .gesture(dragGesture)
+                    .overlay {
+                        SingleTouchPanSurface(
+                            onChanged: updateDrag,
+                            onEnded: finishDrag,
+                            onCancelled: cancelDrag
+                        )
+                    }
                     .transition(.asymmetric(
                         insertion: .scale(scale: 0.92).combined(with: .opacity),
                         removal: .opacity))
@@ -159,24 +174,30 @@ struct SwipeDeckView: View {
         .animation(.cardSpring, value: vm.index)
     }
 
-    private var dragGesture: some Gesture {
-        DragGesture()
-            .onChanged { drag = $0.translation }
-            .onEnded { value in
-                let t = value.translation
-                if t.width > Theme.swipeThreshold {
-                    fling(.right, decision: .keep)
-                } else if t.width < -Theme.swipeThreshold {
-                    fling(.left, decision: .trash)
-                } else if t.height < -Theme.swipeThreshold {
-                    fling(.up, decision: .favorite)
-                } else if t.height > Theme.swipeThreshold {
-                    fling(.down, decision: .skip)
-                } else {
-                    Haptics.soft()
-                    withAnimation(.cardSpring) { drag = .zero }
-                }
-            }
+    private func updateDrag(_ translation: CGSize) {
+        guard !isTransitioning else { return }
+        drag = translation
+    }
+
+    private func finishDrag(_ translation: CGSize) {
+        guard !isTransitioning else { return }
+        if translation.width > Theme.swipeThreshold {
+            fling(.right, decision: .keep)
+        } else if translation.width < -Theme.swipeThreshold {
+            fling(.left, decision: .trash)
+        } else if translation.height < -Theme.swipeThreshold {
+            fling(.up, decision: .favorite)
+        } else if translation.height > Theme.swipeThreshold {
+            fling(.down, decision: .skip)
+        } else {
+            cancelDrag()
+        }
+    }
+
+    private func cancelDrag() {
+        guard !isTransitioning else { return }
+        Haptics.soft()
+        withAnimation(.cardSpring) { drag = .zero }
     }
 
     // MARK: Action bar
@@ -220,6 +241,9 @@ struct SwipeDeckView: View {
     private enum FlingDir { case left, right, up, down }
 
     private func fling(_ dir: FlingDir, decision: Decision) {
+        guard !isTransitioning, vm.current != nil else { return }
+        isTransitioning = true
+
         switch decision {
         case .trash: Haptics.tap(.rigid)
         case .favorite: Haptics.success()
@@ -235,10 +259,94 @@ struct SwipeDeckView: View {
         }
         withAnimation(.fling) { drag = target }
         // Let the card fly off before committing the decision and resetting.
-        Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(180))
+        flingTask = Task { @MainActor in
+            defer {
+                isTransitioning = false
+                flingTask = nil
+            }
+            do {
+                try await Task.sleep(for: .milliseconds(180))
+            } catch {
+                drag = .zero
+                return
+            }
+            guard !Task.isCancelled else {
+                drag = .zero
+                return
+            }
             vm.decide(decision)
             drag = .zero
+        }
+    }
+}
+
+/// A pan surface that binds each drag to its first touch. Additional fingers
+/// are rejected before they can affect translation or end the active gesture.
+private struct SingleTouchPanSurface: UIViewRepresentable {
+    let onChanged: (CGSize) -> Void
+    let onEnded: (CGSize) -> Void
+    let onCancelled: () -> Void
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onChanged: onChanged, onEnded: onEnded, onCancelled: onCancelled)
+    }
+
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
+        view.backgroundColor = .clear
+        let pan = UIPanGestureRecognizer(target: context.coordinator,
+                                         action: #selector(Coordinator.handlePan(_:)))
+        pan.minimumNumberOfTouches = 1
+        pan.maximumNumberOfTouches = 1
+        pan.delegate = context.coordinator
+        view.addGestureRecognizer(pan)
+        return view
+    }
+
+    func updateUIView(_ uiView: UIView, context: Context) {
+        context.coordinator.onChanged = onChanged
+        context.coordinator.onEnded = onEnded
+        context.coordinator.onCancelled = onCancelled
+    }
+
+    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        var onChanged: (CGSize) -> Void
+        var onEnded: (CGSize) -> Void
+        var onCancelled: () -> Void
+        private weak var activeTouch: UITouch?
+
+        init(onChanged: @escaping (CGSize) -> Void,
+             onEnded: @escaping (CGSize) -> Void,
+             onCancelled: @escaping () -> Void) {
+            self.onChanged = onChanged
+            self.onEnded = onEnded
+            self.onCancelled = onCancelled
+        }
+
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                               shouldReceive touch: UITouch) -> Bool {
+            if let activeTouch { return activeTouch === touch }
+            activeTouch = touch
+            return true
+        }
+
+        @objc func handlePan(_ pan: UIPanGestureRecognizer) {
+            // Use a stationary coordinate space so the moving card does not
+            // feed its own offset back into the gesture translation.
+            let point = pan.translation(in: pan.view?.window)
+            let translation = CGSize(width: point.x, height: point.y)
+            switch pan.state {
+            case .began, .changed:
+                onChanged(translation)
+            case .ended:
+                activeTouch = nil
+                onEnded(translation)
+            case .cancelled, .failed:
+                activeTouch = nil
+                onCancelled()
+            default:
+                break
+            }
         }
     }
 }

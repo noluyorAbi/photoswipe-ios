@@ -145,6 +145,12 @@ final class SwipeDeckViewModel: ObservableObject {
         case .duplicates: break
         }
 
+        // Present a fresh random order for every regular review session. Keep
+        // the dedicated "Largest First" source sorted as its name promises.
+        if source != .largest {
+            working.shuffle()
+        }
+
         assets = working
         if working.isEmpty {
             phase = .review   // shows "nothing left here" state
